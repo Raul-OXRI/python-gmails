@@ -88,12 +88,12 @@ def main():
         raise ValueError('Faltan EMAIL_USER o EMAIL_PASS en el archivo .env')
 
     # Leer Excel
-    df = pd.read_excel('votos_linea.xlsx')
+    df = pd.read_csv('Reprote votos virtuales.csv')
     # Lista de correos
     correos = []
 
     for _, row in df.iterrows():
-        email = row['Correo Electronico']
+        email = row['email'] # Asegúrate de que esta columna exista en tu Excel o csv
 
         if pd.isna(email):
             continue

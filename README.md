@@ -87,7 +87,6 @@ Puntos comunes para personalizar:
 
 - Asunto del correo (`msg['Subject']`).
 - Texto del mensaje HTML.
-- Enlace del botón (actualmente usa `#`).
 
 ## Errores frecuentes
 
