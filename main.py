@@ -48,7 +48,7 @@ def crear_html(nombre):
                                     Complete el siguiente formulario antes del 8 de abril para reclamar su regalo:
                                 </p>    
                                 <center>
-                                <a href="#"
+                                <a href="https://form.jotform.com/260895248523869"
                                    style="background-color:#2e6ddf;
                                           color:#ffffff;
                                           padding:14px 28px;
