@@ -4,7 +4,7 @@ Script en Python para enviar un correo HTML a múltiples destinatarios usando Gm
 
 ## Qué hace este proyecto
 
-- Lee una lista de correos desde el archivo `votos_linea.xlsx`.
+- Lee una lista de correos desde el archivo `Reprote votos virtuales.csv`.
 - Toma credenciales de Gmail desde variables de entorno (`.env`).
 - Genera un correo en formato HTML.
 - Envía un único correo con destinatarios en `Bcc` (copia oculta).
@@ -12,7 +12,7 @@ Script en Python para enviar un correo HTML a múltiples destinatarios usando Gm
 ## Estructura del proyecto
 
 - `main.py`: lógica principal de lectura de Excel y envío de correos.
-- `votos_linea.xlsx`: archivo con los correos destino.
+- `Reprote votos virtuales.csv`: archivo con los correos destino.
 - `.env`: credenciales del remitente (no se comparte en git).
 
 ## Requisitos
@@ -60,9 +60,9 @@ Notas importantes:
 - No uses tu contraseña normal de Gmail.
 - Usa una App Password de Google (con verificación en dos pasos habilitada).
 
-## Formato del Excel
+## Formato del csv
 
-El script espera un archivo llamado `votos_linea.xlsx` con una columna exacta:
+El script espera un archivo llamado `Reprote votos virtuales.csv` con una columna exacta:
 
 - `Correo Electronico`
 
