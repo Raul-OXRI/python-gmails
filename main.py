@@ -38,7 +38,7 @@ def crear_html(nombre):
                         <!-- Contenido -->
                         <tr>
                             <td style="padding:30px; color:#555; font-size:15px;">
-                                <h3>Estimado asociado: <strong>{nombre}</strong><br>
+                                <h3><strong>{nombre}:</strong><br>
                                 <p style="text-align:justify;">
                                     Nos complace informarle que, por haber participado en la votación de la Asamblea General, se 
                                     le ha otorgado un obsequio especial como muestra de nuestro agradecimiento por su compromiso 
@@ -77,56 +77,55 @@ def crear_html(nombre):
     """
     return html
 
-
 def main():
-    # Carga variables del archivo .env al entorno actual.
+    # Cargar variables de entorno
     load_dotenv()
-
     # Credenciales del remitente tomadas desde variables de entorno.
     correo = os.getenv('EMAIL_USER')
     contraseña = os.getenv('EMAIL_PASS')
-
     # Valida que existan las credenciales antes de continuar.
     if not correo or not contraseña:
         raise ValueError('Faltan EMAIL_USER o EMAIL_PASS en el archivo .env')
 
-    # Lee el archivo con los destinatarios (nombre y correo).
+    # Leer Excel
     df = pd.read_excel('votos_linea.xlsx')
+    # Lista de correos
+    correos = []
 
-    # Configuración del servidor SMTP de Gmail.
+    for _, row in df.iterrows():
+        email = row['Correo Electronico']
+
+        if pd.isna(email):
+            continue
+
+        correos.append(str(email).strip())
+
+    # Validación: evitar enviar si no hay correos
+    if not correos:
+        print("No hay correos válidos para enviar")
+        return
+
+    # Configurar servidor SMTP
     server = smtplib.SMTP('smtp.gmail.com', 587)
-    
-    # Activa cifrado TLS e inicia sesión con la cuenta remitente.
     server.starttls()
     server.login(correo, contraseña)
 
     try:
-        # Recorre cada fila del Excel para enviar un correo individual.
-        for _, row in df.iterrows():
-            nombre = row['Nombre']
-            email = row['Correo Electronico']
+        msg = MIMEMultipart()
+        msg['From'] = correo
+        msg['To'] = correo 
+        msg['Bcc'] = ", ".join(correos)
+        msg['Subject'] = 'Gracias por votar'
 
-            # Omite filas sin correo válido.
-            if pd.isna(email):
-                continue
+        html_content = crear_html("Estimado asociado")
+        msg.attach(MIMEText(html_content, 'html'))
 
-            # Crea el mensaje con remitente, destinatario y asunto.
-            msg = MIMEMultipart()
-            msg['From'] = correo
-            msg['To'] = email
-            msg['Subject'] = 'Gracias por votar'
+        server.send_message(msg)
 
-            # Adjunta el contenido HTML personalizado al mensaje.
-            html_content = crear_html(nombre)
-            msg.attach(MIMEText(html_content, 'html'))
+        print(f"Correo enviado a {len(correos)} destinatarios")
 
-            # Envía el correo actual.
-            server.send_message(msg)
     finally:
-        # Cierra la conexión SMTP aunque ocurra un error en el envío.
         server.quit()
-
-    print('Correos enviados')
 
 
 if __name__ == '__main__':
