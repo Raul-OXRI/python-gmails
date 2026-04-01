@@ -13,7 +13,7 @@ def crear_html(nombre):
     <html lang="es">
     <head>
         <meta charset="UTF-8">
-        <title>Asamblea General</title>
+        <title>58 Asamblea General</title>
     </head>
     <body style="margin:0; padding:0; background-color:#f2f2f2; font-family:Arial, sans-serif;">
         <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2f2f2">
@@ -24,7 +24,7 @@ def crear_html(nombre):
                         <!-- Título -->
                         <tr>
                             <td align="center" style="padding:15px; font-weight:bold; color:#333;">
-                                Asamblea general
+                                58 Asamblea General Ordinaria
                             </td>
                         </tr>
                         <!-- Banner -->
@@ -37,15 +37,21 @@ def crear_html(nombre):
                         </tr>
                         <!-- Contenido -->
                         <tr>
-                            <td style="padding:30px; color:#555; font-size:15px;">
-                                <h3><strong>{nombre}:</strong><br>
+                            <td style="padding:30px; color:#555">
+                                <p style="margin:0 0 15px 0; font-weight:normal;"><span style="font-weight:bold;">{nombre}:</span></p>
                                 <p style="text-align:justify;">
-                                    Nos complace informarle que, por haber participado en la votación de la Asamblea General, se 
-                                    le ha otorgado un obsequio especial como muestra de nuestro agradecimiento por su compromiso 
+                                    Nos complace informarle que, 
+                                    <span style="font-weight:bold;">por haber participado en la votación de la 58 Asamblea General</span>
+                                    , se 
+                                    le ha otorgado un 
+                                    <span style="font-weight:bold;">obsequio</span> 
+                                    especial como muestra de nuestro agradecimiento por su compromiso 
                                     y participación activa en nuestra cooperativa.
                                 </p>
                                 <p style="text-align:justify;">
-                                    Complete el siguiente formulario antes del 8 de abril para reclamar su regalo:
+                                    Complete el siguiente formulario 
+                                    <span style="font-weight:bold;">antes del 8 de abril</span>
+                                      para reclamar su regalo:
                                 </p>    
                                 <center>
                                 <a href="https://form.jotform.com/260895248523869"
@@ -59,7 +65,7 @@ def crear_html(nombre):
                                    Enlace para llenar el formulario
                                 </a></center>
                                 <p style="text-align:justify;">
-                                    ¡Gracias por ser parte de nuestra comunidad y por su valiosa participación en la asamblea general!
+                                    ¡Gracias por formar parte de <span style="font-weight:bold;">Cooperativa Cobán</span> y por su valiosa participación en la 58 Asamblea General!
                                 </p>
                             </td>
                         </tr>
@@ -81,19 +87,33 @@ def main():
     # Cargar variables de entorno
     load_dotenv()
     # Credenciales del remitente tomadas desde variables de entorno.
-    correo = os.getenv('EMAIL_USER')
-    contraseña = os.getenv('EMAIL_PASS')
-    # Valida que existan las credenciales antes de continuar.
-    if not correo or not contraseña:
-        raise ValueError('Faltan EMAIL_USER o EMAIL_PASS en el archivo .env')
+    correo = os.getenv('EMAIL_USER') or os.getenv('EMAILUSER')
+    contraseña = os.getenv('EMAIL_PASS') or os.getenv('EMAILPASS')
+    host = os.getenv('EMAIL_HOST') or os.getenv('EMAILHOST')
+    port = os.getenv('EMAIL_PORT') or os.getenv('EMAILPORT')
+
+    # Valida que existan las credenciales y datos SMTP antes de continuar.
+    if not correo or not contraseña or not host or not port:
+        raise ValueError('Faltan EMAIL_USER, EMAIL_PASS, EMAIL_HOST o EMAIL_PORT en el archivo .env')
+
+    try:
+        port = int(port)
+    except ValueError:
+        raise ValueError('EMAIL_PORT debe ser un número válido')
 
     # Leer Excel
     df = pd.read_csv('Reprote votos virtuales.csv')
     # Lista de correos
     correos = []
+    columnas_email = [col for col in ('email', 'Correo Electronico') if col in df.columns]
+
+    if not columnas_email:
+        raise ValueError("El CSV debe tener una columna 'email' o 'Correo Electronico'")
+
+    columna_email = columnas_email[0]
 
     for _, row in df.iterrows():
-        email = row['email'] # Asegúrate de que esta columna exista en tu Excel o csv
+        email = row[columna_email]
 
         if pd.isna(email):
             continue
@@ -106,8 +126,14 @@ def main():
         return
 
     # Configurar servidor SMTP
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
+    if port == 465:
+        server = smtplib.SMTP_SSL(host, port)
+    else:
+        server = smtplib.SMTP(host, port)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+
     server.login(correo, contraseña)
 
     try:

@@ -53,6 +53,8 @@ pip install -r requirements.txt
 ```env
 EMAIL_USER=tu_correo@gmail.com
 EMAIL_PASS=tu_app_password
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
 ```
 
 Notas importantes:
@@ -62,8 +64,9 @@ Notas importantes:
 
 ## Formato del csv
 
-El script espera un archivo llamado `Reprote votos virtuales.csv` con una columna exacta:
+El script espera un archivo llamado `Reprote votos virtuales.csv` con una columna de correo:
 
+- `email`
 - `Correo Electronico`
 
 Si una fila no tiene correo, se omite automáticamente.
@@ -90,11 +93,13 @@ Puntos comunes para personalizar:
 
 ## Errores frecuentes
 
-- **Faltan EMAIL_USER o EMAIL_PASS en el archivo .env**: revisa que el archivo `.env` exista y tenga ambas variables.
+- **Faltan EMAIL_USER, EMAIL_PASS, EMAIL_HOST o EMAIL_PORT en el archivo .env**: revisa que el archivo `.env` exista y tenga esas variables.
 
 - **Error de autenticación SMTP**: verifica que `EMAIL_PASS` sea una App Password válida.
 
-- **Error al leer Excel**: confirma que `votos_linea.xlsx` exista en la raíz del proyecto y tenga la columna `Correo Electronico`.
+- **Error al leer CSV**: confirma que `Reprote votos virtuales.csv` exista en la raíz del proyecto y tenga la columna `email`.
+
+- **Error de conexión SMTP**: si usas `EMAIL_PORT=465`, el script conecta con SSL; si usas `587`, conecta con STARTTLS.
 
 ## Seguridad
 
